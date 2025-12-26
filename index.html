@@ -1,0 +1,219 @@
+<!doctype html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Biblioteca Gnóstica - Samael Aun Weor</title>
+        <link rel="stylesheet" href="styles.css" />
+        <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+        />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&display=swap"
+            rel="stylesheet"
+        />
+        <script src="https://cdn.jsdelivr.net/npm/epubjs/dist/epub.min.js"></script>
+    </head>
+    <body>
+        <header>
+            <h1>BIBLIOTECA GNÓSTICA</h1>
+            <h2>OBRAS DE SAMAEL AUN WEOR</h2>
+            <div class="search-container">
+                <input
+                    type="text"
+                    id="buscador"
+                    placeholder="Buscar libros por título o autor..."
+                />
+                <i class="fas fa-search search-icon"></i>
+            </div>
+        </header>
+
+        <main id="libros-container">
+            <section class="carousel-section">
+                <div class="section-header">
+                    <h2>Libros Destacados</h2>
+                    <p>Obras fundamentales de la Cultura gnóstica</p>
+                </div>
+
+                <div class="carousel-container">
+                    <div id="carrusel" class="carrusel">
+                        <!-- Los libros se cargarán dinámicamente -->
+                    </div>
+
+                    <div class="controls">
+                        <button id="prev-carrusel" class="button-prev">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <button id="next-carrusel" class="button-next">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Sección de prueba a ver si carga el Epub con un archivo externo -->
+            <section  id="prueba-epub" style="text-align: center; margin: 2rem 0"  >
+                <h2>Prueba del Visor EPUB</h2>
+                <button id="btnPruebaEpub" class="btn btn-primary">
+                    <i class="fas fa-book"></i> Cargar Moby Dick (Prueba)
+                </button>
+            </section>
+
+            <!-- Sección de todos los libros -->
+            <section class="all-books-section" style="display: none">
+                <div class="section-header">
+                    <h2>Todos los Libros</h2>
+                    <p>Colección completa de obras gnósticas</p>
+                </div>
+                <div id="books-grid" class="books-grid">
+                    <!-- Grid de libros se carga dinámicamente -->
+                </div>
+            </section>
+
+            <!-- Visor EPUB -->
+            <div id="epubViewer" class="epub-viewer">
+                <div id="epubToolbar" class="epub-toolbar">
+                    <div class="epub-title-section">
+                        <button id="closeEpub" class="close-btn">
+                            <i class="fas fa-times"></i>
+                        </button>
+                        <div id="epubTitle">Cargando libro...</div>
+                    </div>
+                    <div id="epubControls" class="epub-controls">
+                        <button
+                            id="prevPage"
+                            class="epub-btn"
+                            aria-label="Página anterior"
+                        >
+                            <i class="fas fa-chevron-left"></i>
+                            Anterior
+                        </button>
+                        <span id="epubProgress">0%</span>
+                        <button id="nextPage" class="epub-btn">
+                            Siguiente
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+                <div id="epubContainer" class="epub-container"></div>
+            </div>
+        </main>
+
+        <section id="introduccion">
+            <h2>Bienvenido a la Biblioteca Gnóstica</h2>
+            <p>
+                Descubre todas las enseñanzas del Venerable Maestro Samael Aun
+                Weor a través de la extensa colección de libros gnostgico, con
+                temas sobre alquimia, esoterismo y desarrollo espiritual.
+            </p>
+            <div class="features">
+                <div class="feature">
+                    <i class="fas fa-book-open"></i>
+                    <h3>Lectura Directa</h3>
+                    <p>
+                        Lee los libros directamente en tu navegador sin
+                        necesidad de descargas
+                    </p>
+                </div>
+                <div class="feature">
+                    <i class="fas fa-search"></i>
+                    <h3>Búsqueda Avanzada</h3>
+                    <p>
+                        Encuentra rápidamente los libros por título o tema de
+                        interés
+                    </p>
+                </div>
+                <div class="feature">
+                    <i class="fas fa-mobile-alt"></i>
+                    <h3>Responsive</h3>
+                    <p>
+                        Disfruta de la lectura en cualquier dispositivo: móvil,
+                        tablet o escritorio
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <section id="acerca-del-autor">
+            <h2>Acerca de Samael Aun Weor</h2>
+            <p>
+                Samael Aun Weor (1917-1977) fue un escritor y conferencista
+                colombiano, fundador del Movimiento Gnóstico Cristiano
+                Universal. Sus enseñanzas abarcan desde la psicología
+                revolucionaria hasta la alquimia sexual, siempre enfocadas en el
+                despertar de la conciencia y la autorrealización del ser humano.
+            </p>
+            <p>
+                A través de más de 60 libros, legó un conocimiento práctico y
+                transformador que combina sabiduría ancestral con ciencia
+                moderna, ofreciendo herramientas concretas para el desarrollo
+                espiritual.
+            </p>
+        </section>
+
+        <footer>
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>Biblioteca Gnóstica</h3>
+                    <p>
+                        Preservando y compartiendo la sabiduría gnóstica para
+                        las futuras generaciones.
+                    </p>
+                </div>
+                <div class="footer-section">
+                    <h3>Contacto</h3>
+                    <p>¿Tienes sugerencias o quieres contribuir?</p>
+                    <button id="btnContacto" class="contact-btn">
+                        Contáctanos
+                    </button>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>
+                    &copy; 2025 Biblioteca Gnóstica | Libros de dominio público
+                    y con licencia gratuita
+                </p>
+            </div>
+        </footer>
+
+        <!-- Modal para información del libro -->
+        <div id="bookModal" class="modal">
+            <div class="modal-content">
+                <span class="close-modal">&times;</span>
+                <div class="modal-body">
+                    <img
+                        id="modalCover"
+                        class="modal-cover"
+                        src=""
+                        alt="Portada del libro"
+                    />
+                    <div class="modal-info">
+                        <h3 id="modalTitle"></h3>
+                        <p id="modalAuthor"></p>
+                        <p id="modalDescription"></p>
+                        <div class="modal-stats">
+                            <span id="modalPages"></span>
+                            <span id="modalTime"></span>
+                        </div>
+                        <div class="modal-actions">
+                            <button id="readButton" class="btn btn-primary">
+                                <i class="fas fa-book-open"></i>
+                                Leer Ahora
+                            </button>
+                            <button
+                                id="favoriteButton"
+                                class="btn btn-secondary"
+                            >
+                                <i class="fas fa-heart"></i>
+                                Favoritos
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script src="script.js"></script>
+    </body>
+</html>

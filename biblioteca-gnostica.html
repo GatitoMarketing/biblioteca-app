@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Biblioteca Gnóstica</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/epubjs/dist/epub.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            color: #e5dac6;
+            font-family: 'Cinzel', serif;
+            min-height: 100vh;
+        }
+
+        header {
+            text-align: center;
+            padding: 2rem;
+            border-bottom: 2px solid rgba(212, 175, 55, 0.3);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            color: #d4af37;
+            margin-bottom: 0.5rem;
+            text-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
+        }
+
+        h2 {
+            font-size: 1.2rem;
+            color: #e5dac6;
+            margin-bottom: 1rem;
+            opacity: 0.8;
+        }
+
+        #buscador {
+            width: 100%;
+            max-width: 500px;
+            padding: 12px 20px;
+            border: 2px solid rgba(212, 175, 55, 0.3);
+            border-radius: 25px;
+            background: rgba(26, 26, 46, 0.8);
+            color: #e5dac6;
+            font-size: 1rem;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        #buscador:focus {
+            border-color: #d4af37;
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.3);
+        }
+
+        #buscador::placeholder {
+            color: rgba(229, 218, 198, 0.6);
+        }
+
+        main {
+            padding: 2rem;
+        }
+
+        .carousel-container {
+            width: 100%;
+            max-width: 800px;
+            margin: 2rem auto;
+        }
+
+        .carrusel {
+            width: 100%;
+            height: 400px;
+            position: relative;
+            perspective: 1000px;
+            border: 2px solid rgba(212, 175, 55, 0.3);
+            border-radius: 12px;
+            background: rgba(212, 175, 55, 0.05);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .slide {
+            width: 150px;
+            height: 250px;
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            margin-left: -75px;
+            margin-top: -125px;
+            border: 2px solid rgba(212, 175, 55, 0.3);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.5s ease;
+            transform-style: preserve-3d;
+            display: none;
+        }
+
+        .slide:hover {
+            border-color: rgba(212, 175, 55, 0.8);
+            box-shadow: 0 10px 30px rgba(212, 175, 55, 0.4);
+        }
+
+        .slide img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 6px;
+        }
+
+        .controls {
+            margin-top: 2rem;
+            text-align: center;
+        }
+
+        .button-prev, .button-next {
+            background: rgba(212, 175, 55, 0.8);
+            color: #1a1a2e;
+            border: none;
+            padding: 12px 20px;
+            margin: 0 10px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+            font-weight: bold;
+        }
+
+        .button-prev:hover, .button-next:hover {
+            background: #d4af37;
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(212, 175, 55, 0.4);
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            margin: 5% auto;
+            padding: 2rem;
+            border: 2px solid #d4af37;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 600px;
+            position: relative;
+        }
+
+        .close {
+            color: #d4af37;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            position: absolute;
+            right: 15px;
+            top: 15px;
+        }
+
+        .close:hover {
+            color: #fff;
+        }
+
+        .modal-body {
+            display: flex;
+            gap: 2rem;
+            margin-top: 1rem;
+        }
+
+        .modal-cover {
+            width: 150px;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 8px;
+            border: 2px solid rgba(212, 175, 55, 0.3);
+        }
+
+        .modal-info {
+            flex: 1;
+        }
+
+        .modal-info h3 {
+            color: #d4af37;
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .modal-info p {
+            color: #e5dac6;
+            margin-bottom: 1rem;
+            line-height: 1.6;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            flex: 1;
+        }
+
+        .btn-primary {
+            background: #d4af37;
+            color: #1a1a2e;
+        }
+
+        .btn-primary:hover {
+            background: #f4bf47;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(212, 175, 55, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(212, 175, 55, 0.2);
+            color: #d4af37;
+            border: 1px solid rgba(212, 175, 55, 0.5);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(212, 175, 55, 0.3);
+        }
+
+        /* Secciones */
+        section {
+            max-width: 800px;
+            margin: 3rem auto;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        section h2 {
+            color: #d4af37;
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        section p, section li {
+            color: #e5dac6;
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+
+        section ul {
+            text-align: left;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        #btnSugerencia {
+            background: #d4af37;
+            color: #1a1a2e;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        #btnSugerencia:hover {
+            background: #f4bf47;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(212, 175, 55, 0.4);
+        }
+
+        footer {
+            background: rgba(26, 26, 46, 0.8);
+            text-align: center;
+            padding: 2rem;
+            border-top: 2px solid rgba(212, 175, 55, 0.3);
+            margin-top: 3rem;
+            color: rgba(229, 218, 198, 0.8);
+        }
+
+        /* Visor EPUB */
+        #epubViewer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #1a1a2e;
+            z-index: 2000;
+            display: none;
+        }
+
+        #epubContainer {
+            height: calc(100vh - 120px);
+            margin: 60px auto;
+            max-width: 800px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        #epubToolbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 60px;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            border-bottom: 2px solid #d4af37;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 2rem;
+            z-index: 2001;
+        }
+
+        #epubTitle {
+            color: #d4af37;
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+
+        #epubControls {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .epub-btn {
+            background: rgba(212, 175, 55, 0.8);
+            color: #1a1a2e;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .epub-btn:hover {
+            background: #d4af37;
+            transform: scale(1.05);
+        }
+
+        .epub-btn:disabled {
+            background: rgba(212, 175, 55, 0.3);
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        #epubProgress {
+            color: #e5dac6;
+            font-size: 0.9rem;
+        }
+
+        #closeEpub {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        #closeEpub:hover {
+            background: #c82333;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .modal-body {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .modal-cover {
+                margin: 0 auto;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .slide {
+                width: 120px;
+                height: 200px;
+                margin-left: -60px;
+                margin-top: -100px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>BIBLIOTECA GNÓSTICA</h1>
+        <h2>ESTA PÁGINA ESTÁ EN CONSTRUCCIÓN</h2>
+        <input type="text" id="buscador" placeholder="Buscar Libros...">
+    </header>
+
+    <main id="libros-container">
+        <div class="carousel-container">
+            <div id="carrusel" class="carrusel">
+                <div class="slide" data-epub="/api/books/cursozodiacal_1753411028462.epub" data-title="Curso Zodiacal" data-author="Samael Aun Weor">
+                    <img src="https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=600" alt="Curso Zodiacal">
+                </div>
+                <div class="slide" data-epub="/api/books/educacionfundamental_1753411068116.epub" data-title="Educación Fundamental" data-author="Samael Aun Weor">
+                    <img src="https://images.unsplash.com/photo-1481627834876-b7833e8f5570?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=600" alt="Educación Fundamental">
+                </div>
+                <div class="slide" data-epub="/api/books/pistissophia_1753411217567.epub" data-title="Pistis Sophia" data-author="Samael Aun Weor">
+                    <img src="https://images.unsplash.com/photo-1578662996442-48f60103fc96?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=600" alt="Pistis Sophia">
+                </div>
+                <div class="slide" data-epub="/api/books/elmatrimonioperfecto_1753411145580.epub" data-title="El Matrimonio Perfecto" data-author="Samael Aun Weor">
+                    <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=600" alt="El Matrimonio Perfecto">
+                </div>
+                <div class="slide" data-epub="/api/books/lamagiadelasrunas_1753411172512.epub" data-title="La Magia de las Runas" data-author="Samael Aun Weor">
+                    <img src="https://images.unsplash.com/photo-1518281361980-b26bfd556770?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=600" alt="La Magia de las Runas">
+                </div>
+                <div class="slide" data-epub="/api/books/elcristosocial_1753411093858.epub" data-title="El Cristo Social" data-author="Samael Aun Weor">
+                    <img src="https://images.unsplash.com/photo-1544947950-fa07a98d237f?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=600" alt="El Cristo Social">
+                </div>
+                <div class="slide" data-epub="/api/books/ellibroamarillo_1753411118920.epub" data-title="El Libro Amarillo" data-author="Samael Aun Weor">
+                    <img src="https://images.unsplash.com/photo-1589829085413-56de8ae18c73?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=600" alt="El Libro Amarillo">
+                </div>
+            </div>
+
+            <div class="controls">
+                <button id="prev-carrusel" class="button-prev">⬅</button>
+                <button id="next-carrusel" class="button-next">➡</button>
+            </div>
+        </div>
+
+        <!-- Visor EPUB -->
+        <div id="epubViewer">
+            <div id="epubToolbar">
+                <div id="epubTitle">Cargando libro...</div>
+                <div id="epubControls">
+                    <button id="prevPage" class="epub-btn">⬅ Anterior</button>
+                    <span id="epubProgress">0%</span>
+                    <button id="nextPage" class="epub-btn">Siguiente ➡</button>
+                    <button id="closeEpub">✕ Cerrar</button>
+                </div>
+            </div>
+            <div id="epubContainer"></div>
+        </div>
+    </main>
+
+    <section id="introduccion">
+        <h2>Bienvenido a la Biblioteca Gnóstica</h2>
+        <p>Encuentra y disfruta de libros gratuitos en línea sin necesidad de descarga.</p>
+    </section>
+
+    <section id="como-funciona">
+        <h2>¿Cómo funciona?</h2>
+        <ul>
+            <li>Usa la barra de búsqueda para encontrar libros por título o autor.</li>
+            <li>Haz clic en un libro para leerlo en nuestro visor EPUB.</li>
+            <li>Activa el modo oscuro para una mejor experiencia de lectura.</li>
+        </ul>
+    </section>
+
+    <section id="contacto">
+        <h2>Contacto y sugerencias</h2>
+        <p>¿Quieres más libros? Envíanos tus sugerencias y contribuye a nuestra biblioteca.</p>
+        <button id="btnSugerencia">Enviar sugerencia</button>
+    </section>
+
+    <footer>
+        <p>&copy; 2025 Biblioteca Gnóstica | Libros de dominio público o con licencia gratuita.</p>
+    </footer>
+
+    <!-- Modal para mostrar información del libro -->
+    <div id="bookModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <div class="modal-body">
+                <img id="modalCover" class="modal-cover" src="" alt="Portada del libro">
+                <div class="modal-info">
+                    <h3 id="modalTitle"></h3>
+                    <p id="modalAuthor"></p>
+                    <p id="modalDescription"></p>
+                    <div class="modal-actions">
+                        <button id="readButton" class="btn btn-primary">
+                            <i class="fas fa-book-open"></i>
+                            Leer Ahora
+                        </button>
+                        <button id="favoriteButton" class="btn btn-secondary">
+                            <i class="fas fa-heart"></i>
+                            Favoritos
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Variables globales
+        let index = 0;
+        const totalSlides = 7;
+        let currentBook = null;
+        let rendition = null;
+
+        // Datos de los libros
+        const librosData = {
+            "Curso Zodiacal": {
+                descripcion: "El hombre se halla crucificado en el sexo. Una obra fundamental sobre astrología esotérica y la comprensión de los signos zodiacales desde la perspectiva gnóstica."
+            },
+            "Educación Fundamental": {
+                descripcion: "Un sistema educativo revolucionario basado en el desarrollo integral del ser humano y la sabiduría perenne."
+            },
+            "Pistis Sophia": {
+                descripcion: "El libro gnóstico más importante revelado. Una interpretación esotérica del antiguo texto gnóstico de Pistis Sophia."
+            },
+            "El Matrimonio Perfecto": {
+                descripcion: "Para producir una raza de superhombres. Una guía completa sobre la alquimia sexual y la transmutación de las energías creadoras."
+            },
+            "La Magia de las Runas": {
+                descripcion: "Mensaje de Navidad 1968/1969. Abecedario Sagrado que revela los misterios de las antiguas runas nórdicas y su aplicación práctica."
+            },
+            "El Cristo Social": {
+                descripcion: "Una exploración profunda de la dimensión social de la enseñanza crística, abordando la justicia, la libertad y la transformación de la sociedad."
+            },
+            "El Libro Amarillo": {
+                descripcion: "Un libro de ocultismo absolutamente práctico que revela las claves fundamentales del esoterismo gnóstico."
+            }
+        };
+
+        // Función para actualizar el carrusel
+        function actualizarCarrusel() {
+            const slides = document.querySelectorAll('.slide');
+            
+            slides.forEach((slide, i) => {
+                const offset = i - index;
+                let transform = '';
+                let opacity = '0';
+                let zIndex = '0';
+                let display = 'none';
+
+                // Mostrar solo 5 slides (centro ± 2)
+                if (Math.abs(offset) <= 2) {
+                    display = 'block';
+                    
+                    switch (offset) {
+                        case -2:
+                            transform = 'translateX(-350px) translateZ(-200px) rotateY(35deg) scale(0.6)';
+                            opacity = '0.4';
+                            zIndex = '1';
+                            break;
+                        case -1:
+                            transform = 'translateX(-175px) translateZ(-100px) rotateY(25deg) scale(0.8)';
+                            opacity = '0.7';
+                            zIndex = '2';
+                            break;
+                        case 0:
+                            transform = 'translateX(0px) translateZ(0px) rotateY(0deg) scale(1)';
+                            opacity = '1';
+                            zIndex = '3';
+                            break;
+                        case 1:
+                            transform = 'translateX(175px) translateZ(-100px) rotateY(-25deg) scale(0.8)';
+                            opacity = '0.7';
+                            zIndex = '2';
+                            break;
+                        case 2:
+                            transform = 'translateX(350px) translateZ(-200px) rotateY(-35deg) scale(0.6)';
+                            opacity = '0.4';
+                            zIndex = '1';
+                            break;
+                    }
+                }
+
+                slide.style.display = display;
+                slide.style.transform = transform;
+                slide.style.opacity = opacity;
+                slide.style.zIndex = zIndex;
+            });
+        }
+
+        // Función para ir al slide anterior
+        function prev() {
+            index = (index - 1 + totalSlides) % totalSlides;
+            actualizarCarrusel();
+        }
+
+        // Función para ir al siguiente slide
+        function next() {
+            index = (index + 1) % totalSlides;
+            actualizarCarrusel();
+        }
+
+        // Función para mostrar el modal del libro
+        function mostrarModal(titulo, autor, imagen, descripcion) {
+            const modal = document.getElementById('bookModal');
+            const modalTitle = document.getElementById('modalTitle');
+            const modalAuthor = document.getElementById('modalAuthor');
+            const modalCover = document.getElementById('modalCover');
+            const modalDescription = document.getElementById('modalDescription');
+
+            modalTitle.textContent = titulo;
+            modalAuthor.textContent = `por ${autor}`;
+            modalCover.src = imagen;
+            modalCover.alt = titulo;
+            modalDescription.textContent = descripcion;
+
+            modal.style.display = 'block';
+        }
+
+        // Función para cerrar el modal
+        function cerrarModal() {
+            const modal = document.getElementById('bookModal');
+            modal.style.display = 'none';
+        }
+
+        // Función para abrir el visor EPUB
+        function abrirVisorEpub(epubUrl, titulo) {
+            const viewer = document.getElementById('epubViewer');
+            const container = document.getElementById('epubContainer');
+            const titleElement = document.getElementById('epubTitle');
+            
+            // Mostrar el visor
+            viewer.style.display = 'block';
+            titleElement.textContent = titulo;
+            
+            // Limpiar contenedor anterior
+            container.innerHTML = '';
+            
+            try {
+                // Crear instancia del libro EPUB
+                currentBook = ePub(epubUrl);
+                
+                // Crear la renderización
+                rendition = currentBook.renderTo("epubContainer", {
+                    width: "100%",
+                    height: "100%",
+                    spread: "none"
+                });
+                
+                // Mostrar el libro
+                rendition.display();
+                
+                // Configurar navegación con teclado
+                rendition.on("keyup", function(event) {
+                    if (event.key === "ArrowLeft") {
+                        rendition.prev();
+                    } else if (event.key === "ArrowRight") {
+                        rendition.next();
+                    }
+                });
+                
+                // Actualizar progreso
+                rendition.on("relocated", function(location) {
+                    const progress = Math.round(location.start.percentage * 100);
+                    document.getElementById('epubProgress').textContent = progress + '%';
+                });
+                
+                console.log('Libro EPUB cargado:', titulo);
+                
+            } catch (error) {
+                console.error('Error cargando EPUB:', error);
+                container.innerHTML = `
+                    <div style="padding: 2rem; text-align: center; color: #666;">
+                        <h3>Error cargando el libro</h3>
+                        <p>No se pudo cargar el archivo EPUB: ${titulo}</p>
+                        <p>URL: ${epubUrl}</p>
+                        <button onclick="cerrarVisorEpub()" style="margin-top: 1rem; padding: 10px 20px; background: #d4af37; color: #1a1a2e; border: none; border-radius: 5px; cursor: pointer;">Cerrar</button>
+                    </div>
+                `;
+            }
+        }
+
+        // Función para cerrar el visor EPUB
+        function cerrarVisorEpub() {
+            const viewer = document.getElementById('epubViewer');
+            viewer.style.display = 'none';
+            
+            // Limpiar recursos
+            if (rendition) {
+                rendition.destroy();
+                rendition = null;
+            }
+            if (currentBook) {
+                currentBook.destroy();
+                currentBook = null;
+            }
+        }
+
+        // Inicializar cuando se carga la página
+        document.addEventListener('DOMContentLoaded', function() {
+            // Inicializar carrusel
+            actualizarCarrusel();
+
+            // Event listeners para controles del carrusel
+            document.getElementById('prev-carrusel').addEventListener('click', prev);
+            document.getElementById('next-carrusel').addEventListener('click', next);
+
+            // Event listeners para clicks en slides - ABRIR DIRECTAMENTE EL VISOR
+            const slides = document.querySelectorAll('.slide');
+            slides.forEach(slide => {
+                slide.addEventListener('click', function() {
+                    const titulo = this.getAttribute('data-title');
+                    const epubUrl = this.getAttribute('data-epub');
+                    
+                    // Abrir directamente el visor EPUB
+                    abrirVisorEpub(epubUrl, titulo);
+                });
+            });
+
+            // Event listeners para modal
+            document.querySelector('.close').addEventListener('click', cerrarModal);
+            document.getElementById('bookModal').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    cerrarModal();
+                }
+            });
+
+            // Event listener para botón de leer
+            document.getElementById('readButton').addEventListener('click', function() {
+                // Obtener información del libro del modal
+                const titulo = document.getElementById('modalTitle').textContent;
+                const slides = document.querySelectorAll('.slide');
+                let epubUrl = '';
+                
+                // Buscar la URL del EPUB correspondiente
+                slides.forEach(slide => {
+                    if (slide.getAttribute('data-title') === titulo) {
+                        epubUrl = slide.getAttribute('data-epub');
+                    }
+                });
+                
+                if (epubUrl) {
+                    cerrarModal();
+                    abrirVisorEpub(epubUrl, titulo);
+                } else {
+                    alert('No se encontró el archivo EPUB para este libro');
+                }
+            });
+
+            // Event listener para botón de favoritos
+            document.getElementById('favoriteButton').addEventListener('click', function() {
+                alert('Libro agregado a favoritos');
+            });
+
+            // Event listener para búsqueda
+            document.getElementById('buscador').addEventListener('input', function(e) {
+                // Aquí se puede implementar la funcionalidad de búsqueda
+                console.log('Buscando:', e.target.value);
+            });
+
+            // Event listener para botón de sugerencias
+            document.getElementById('btnSugerencia').addEventListener('click', function() {
+                alert('Funcionalidad de sugerencias será implementada próximamente');
+            });
+
+            // Event listeners para controles del visor EPUB
+            document.getElementById('closeEpub').addEventListener('click', cerrarVisorEpub);
+            document.getElementById('prevPage').addEventListener('click', function() {
+                if (rendition) {
+                    rendition.prev();
+                }
+            });
+            document.getElementById('nextPage').addEventListener('click', function() {
+                if (rendition) {
+                    rendition.next();
+                }
+            });
+
+            // Navegación con teclado
+            document.addEventListener('keydown', function(e) {
+                const epubViewer = document.getElementById('epubViewer');
+                const modal = document.getElementById('bookModal');
+                
+                if (epubViewer.style.display === 'block') {
+                    // Si el visor EPUB está abierto
+                    if (e.key === 'ArrowLeft') {
+                        e.preventDefault();
+                        if (rendition) rendition.prev();
+                    } else if (e.key === 'ArrowRight') {
+                        e.preventDefault();
+                        if (rendition) rendition.next();
+                    } else if (e.key === 'Escape') {
+                        e.preventDefault();
+                        cerrarVisorEpub();
+                    }
+                } else if (modal.style.display === 'block') {
+                    // Si el modal está abierto
+                    if (e.key === 'Escape') {
+                        cerrarModal();
+                    }
+                } else {
+                    // Navegación normal del carrusel
+                    if (e.key === 'ArrowLeft') {
+                        prev();
+                    } else if (e.key === 'ArrowRight') {
+                        next();
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>
