@@ -1,0 +1,20 @@
+Este archivo representa un libro EPUB de muestra. En una implementación real, aquí se colocarían los archivos EPUB reales que los usuarios podrían leer.
+
+Para que la aplicación funcione completamente, necesitarías:
+
+1. Archivos EPUB reales en esta carpeta
+2. Actualizar las rutas en el archivo main.js para que apunten a los archivos EPUB correctos
+3. Opcionalmente, implementar un sistema de backend para gestionar los archivos EPUB
+
+Formatos EPUB compatibles:
+- EPUB 2.0
+- EPUB 3.0
+- Archivos con DRM básico (dependiendo de la configuración)
+
+Estructura típica de un archivo EPUB:
+- META-INF/container.xml
+- OEBPS/content.opf
+- OEBPS/toc.ncx
+- OEBPS/text/ (archivos HTML del contenido)
+- OEBPS/images/ (imágenes del libro)
+- OEBPS/css/ (estilos CSS)
